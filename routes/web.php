@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/working', function () {
+    return App\Models\User::search('John Doe')->get();
+});
+
+Route::get('/not-working', function () {
+    return App\Models\User::search('John Doe', function($meilisearch, string $query, array $options) {
+        $options['sort'] = ['name:asc'];
+        $options['filter'] = 'email IS NOT NULL';
+
+        /** @var Meilisearch\Endpoints\Indexes $meilisearch */
+        return $meilisearch->search($query, $options);
+    })->get();
 });
